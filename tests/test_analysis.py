@@ -49,8 +49,25 @@ def test_run_all_produces_files(toy_counts, tmp_path):
     assert "`<s>" in q5_md and "| <s>" not in q5_md and "| <s> " not in q5_md
     # R15: per-seed side-by-side greedy table
     tri_md = (out / "trigram.md").read_text(encoding="utf-8")
-    assert "| seed | bigram greedy | trigram greedy | bigram cycle (start/length) | trigram cycle (start/length) |" in tri_md
+    assert "| seed | bigram greedy | trigram greedy | bigram 循環（起點／回到／長度） | trigram 循環（起點／回到／長度） |" in tri_md
     assert tri_md.count("\n| `") >= 5  # one row per seed
+
+
+def test_greedy_cycle_wording_reports_entry_repeat_and_length(toy_counts, tmp_path):
+    # R22: cycle_start 是第一次回到已出現狀態的步數，循環起點是 cycle_start − cycle_length
+    run_all(toy_counts, tmp_path)
+    q1 = json.loads((tmp_path / "q1.json").read_text())
+    q1_md = (tmp_path / "q1.md").read_text(encoding="utf-8")
+    tri_md = (tmp_path / "trigram.md").read_text(encoding="utf-8")
+    assert "進入長度" not in q1_md and "cycle (start/length)" not in tri_md
+    greedy = [r for r in q1["rows"] if r["mode"] == "greedy" and r["cycle_start"] is not None]
+    assert greedy
+    for r in greedy:
+        cs, L = r["cycle_start"], r["cycle_length"]
+        assert f"（第 {cs} 步首次回到已出現的狀態；循環長度 {L}，循環從第 {cs - L} 步開始）" in q1_md
+    # 玩具語料 seed「他」：bigram 6/5 → 起點 1，trigram 7/5 → 起點 2
+    row = next(line for line in tri_md.splitlines() if line.startswith("| `他` |"))
+    assert row.endswith("| 1 / 6 / 5 | 2 / 7 / 5 |")
 
 
 def test_analyze_cli_records_timing(toy_counts, tmp_path):

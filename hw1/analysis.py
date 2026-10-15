@@ -74,7 +74,11 @@ def q1_greedy_vs_sample(bm: BigramModel, tm: TrigramModel | None, out: Path, n: 
     md = ["# Q1 貪婪生成 vs 抽樣", ""]
     for r in rows:
         tag = f"[{r['model']}/{r['mode']}" + (f"/seed{r['rng_seed']}" if r["rng_seed"] is not None else "") + "]"
-        extra = f"（第 {r['cycle_start']} 步進入長度 {r['cycle_length']} 的循環）" if r["mode"] == "greedy" and r["cycle_start"] is not None else ""
+        extra = ""
+        if r["mode"] == "greedy" and r["cycle_start"] is not None:
+            # cycle_start 是第一次回到已出現狀態的步數；循環本身從 cycle_start − cycle_length 步開始
+            cs, cl = r["cycle_start"], r["cycle_length"]
+            extra = f"（第 {cs} 步首次回到已出現的狀態；循環長度 {cl}，循環從第 {cs - cl} 步開始）"
         md.append(f"- **{_md(r['seed'])}** {tag} {extra}: {_md(r['text'])}")
     _write(out, "q1", data, "\n".join(md) + "\n")
     return data
@@ -232,19 +236,24 @@ def _cut(text: str, n: int = 60) -> str:
 
 
 def _cycle(r: dict | None) -> str:
-    return "—" if r is None or r["cycle_start"] is None else f"{r['cycle_start']} / {r['cycle_length']}"
+    """「起點 / 回到 / 長度」：起點 = cycle_start − cycle_length，回到 = cycle_start。"""
+    if r is None or r["cycle_start"] is None:
+        return "—"
+    cs, cl = r["cycle_start"], r["cycle_length"]
+    return f"{cs - cl} / {cs} / {cl}"
 
 
 def _greedy_table(q1_rows: list[dict]) -> list[str]:
-    """每個 seed 一列：bigram / trigram 的貪婪輸出（前 60 字）與循環（起點/長度）並排（R15）。"""
+    """每個 seed 一列：bigram / trigram 的貪婪輸出（前 60 字）與循環（起點/回到/長度）並排（R15、R22）。"""
     greedy = {(r["model"], r["seed"]): r for r in q1_rows if r["mode"] == "greedy"}
     md = ["", "## 貪婪生成並排（文字取前 60 字）", "",
-          "| seed | bigram greedy | trigram greedy | bigram cycle (start/length) | trigram cycle (start/length) |",
+          "| seed | bigram greedy | trigram greedy | bigram 循環（起點／回到／長度） | trigram 循環（起點／回到／長度） |",
           "|---|---|---|---|---|"]
     for seed in dict.fromkeys(r["seed"] for r in q1_rows):
         b, t = greedy.get(("bigram", seed)), greedy.get(("trigram", seed))
         md.append(f"| {_md(seed, table=True)} | {_md(_cut(b['text']), table=True) if b else '—'} | "
                   f"{_md(_cut(t['text']), table=True) if t else '—'} | {_cycle(b)} | {_cycle(t)} |")
+    md += ["", "起點：循環開始的步數；回到：第一次回到已出現狀態的步數（`cycle_start`）；長度：`cycle_length`。起點 = 回到 − 長度。"]
     return md
 
 
