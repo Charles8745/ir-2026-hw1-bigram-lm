@@ -1,0 +1,305 @@
+{
+ "n_words": 50,
+ "rows": [
+  {
+   "model": "bigram",
+   "seed": "台灣",
+   "mode": "greedy",
+   "rng_seed": null,
+   "text": "的一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個",
+   "cycle_start": 6,
+   "cycle_length": 4,
+   "n_sentences": 0
+  },
+  {
+   "model": "bigram",
+   "seed": "台灣",
+   "mode": "sample",
+   "rng_seed": 0,
+   "text": "嘉義縣布袋鎮，是對角方程組就殺死它角色詮釋，SHINee的動畫片《獨處。 ｜ 1947年，該書涵蓋政治學專業拆機報告還尚未抵達義大利足球的積分配置站下車時退回申請香港特區行政長官施政報告中的有機合成中： ｜ 佳",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  },
+  {
+   "model": "bigram",
+   "seed": "台灣",
+   "mode": "sample",
+   "rng_seed": 1,
+   "text": "超過格拉斯哥大學西奈山的由來習性不明。 ｜ 常規步兵科只有18世紀的劇本。 ｜ 每屆任期四年國泰虐民甚於2003年，名庚，為百姓安之出繼華頂山南側是由里斯本部分發生了1807年的破產，寓居",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  },
+  {
+   "model": "bigram",
+   "seed": "台灣",
+   "mode": "sample",
+   "rng_seed": 2,
+   "text": "有多個車廂，表現入選明星賽。 ｜ 軼事據日本有線數字電視於固守疲敵”。 ｜ 俄羅斯教堂該專輯準備應對迫在眉睫的其中，一下夸克則有資料顯示記憶體來活化B一定距離正在興起而得到尊重。 ｜ 他",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 3
+  },
+  {
+   "model": "trigram",
+   "seed": "台灣",
+   "mode": "greedy",
+   "rng_seed": null,
+   "text": "的「」，是下轄的一個市鎮，屬於安第斯山脈的一部分，海拔高度約5000人。 ｜ 在《》，是下轄的一個市鎮，屬於安第斯山脈的一部分，海拔高度約5000人。 ｜ 在《》，是下轄的一個",
+   "cycle_start": 26,
+   "cycle_length": 21,
+   "n_sentences": 2
+  },
+  {
+   "model": "trigram",
+   "seed": "台灣",
+   "mode": "sample",
+   "rng_seed": 0,
+   "text": "嘉義縣中埔鄉的一個地鐵站複合，2015年溫布林登網球錦標賽，隨隊參加當屆-zh-hans凱爾特人zh-hk巴拉刈溶液solubleconcentratesSL及336名水兵。 ｜ 這是韓國首例孕婦感染病例，該組織也經歷了大躍進的開展",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 1
+  },
+  {
+   "model": "bigram",
+   "seed": "他",
+   "mode": "greedy",
+   "rng_seed": null,
+   "text": "的一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個",
+   "cycle_start": 6,
+   "cycle_length": 4,
+   "n_sentences": 0
+  },
+  {
+   "model": "bigram",
+   "seed": "他",
+   "mode": "sample",
+   "rng_seed": 0,
+   "text": "一生。 ｜ 在右上角移至大阪府貝塚市屬於青年人打了董必武等外，困難。 ｜ 1947年，該書涵蓋政治學專業拆機報告還尚未抵達義大利足球的積分配置站下車時退回申請香港特區行政長官施政報告中的有機合成中： ｜ 佳",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 3
+  },
+  {
+   "model": "bigram",
+   "seed": "他",
+   "mode": "sample",
+   "rng_seed": 1,
+   "text": "不傳給了王力平可以用於驅散人群之間的中途返回廣州 ｜ 2005年，陳逸豆仔埔溪新莊子寨頭廣美小雪當蘇聯在花輪服務區。 ｜ 新華總社港九新界的士幌線車站與伍德沃德的金曲」「槍彈，寓居",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  },
+  {
+   "model": "bigram",
+   "seed": "他",
+   "mode": "sample",
+   "rng_seed": 2,
+   "text": "曾被氣體的所謂傳統上的一做家務，形成一對老夫妻住老婆未確認，不做祖母正是當年仇思達2002年，包括陰毛亦共同建造。 ｜ 改編前後》第三十五條：申昇瓚，慕容農南路的郵政編碼為",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 1
+  },
+  {
+   "model": "trigram",
+   "seed": "他",
+   "mode": "greedy",
+   "rng_seed": null,
+   "text": "的父親是一名美國男演員。 ｜ 在《》，是下轄的一個市鎮，屬於安第斯山脈的一部分，海拔高度約5000人。 ｜ 在《》，是下轄的一個市鎮，屬於安第斯山脈的一部分，海拔高度約5000人。 ｜",
+   "cycle_start": 29,
+   "cycle_length": 21,
+   "n_sentences": 3
+  },
+  {
+   "model": "trigram",
+   "seed": "他",
+   "mode": "sample",
+   "rng_seed": 0,
+   "text": "一生的故事。 ｜ 靈敏度時間增益控制SensitivitytimecontrolSTC靈敏度時間增益控制用來向另一人或者多個DNS受到防火長城」一場，殲陳粟大部或一部，而且他幾乎不再出現在如聖甲蟲之類的社會新聞的片段起名為宋。 ｜",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  },
+  {
+   "model": "bigram",
+   "seed": "的",
+   "mode": "greedy",
+   "rng_seed": null,
+   "text": "一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮",
+   "cycle_start": 5,
+   "cycle_length": 4,
+   "n_sentences": 0
+  },
+  {
+   "model": "bigram",
+   "seed": "的",
+   "mode": "sample",
+   "rng_seed": 0,
+   "text": "里程碑。 ｜ 在右上角移至大阪府貝塚市屬於青年人打了董必武等外，困難。 ｜ 1947年，該書涵蓋政治學專業拆機報告還尚未抵達義大利足球的積分配置站下車時退回申請香港特區行政長官施政報告中的有機合成中： ｜ 佳",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 3
+  },
+  {
+   "model": "bigram",
+   "seed": "的",
+   "mode": "sample",
+   "rng_seed": 1,
+   "text": "痛苦失利，排入水道中獲選為到了少數民族政策的優勝，馬修，被破壞神經系統疾病或ltaasvxtxaasvxtxgt有時難以持久的美國十歲那年，如同袁世凱進行甚至是本。 ｜ 中間綁有自己就任為止。 ｜ 人口埃爾利",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  },
+  {
+   "model": "bigram",
+   "seed": "的",
+   "mode": "sample",
+   "rng_seed": 2,
+   "text": "一位出旺盛，表現入選明星賽。 ｜ 軼事據日本有線數字電視於固守疲敵”。 ｜ 俄羅斯教堂該專輯準備應對迫在眉睫的其中，一下夸克則有資料顯示記憶體來活化B一定距離正在興起而得到尊重。 ｜ 他",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 3
+  },
+  {
+   "model": "trigram",
+   "seed": "的",
+   "mode": "greedy",
+   "rng_seed": null,
+   "text": "一個市鎮，屬於安第斯山脈的一部分，海拔高度約5000人。 ｜ 在《》，是下轄的一個市鎮，屬於安第斯山脈的一部分，海拔高度約5000人。 ｜ 在《》，是下轄的一個市鎮，屬於安第斯山脈的一部分，",
+   "cycle_start": 22,
+   "cycle_length": 21,
+   "n_sentences": 2
+  },
+  {
+   "model": "trigram",
+   "seed": "的",
+   "mode": "sample",
+   "rng_seed": 0,
+   "text": "里程碑。 ｜ 在威廉斯車手費利佩·岡薩雷斯MargaritoGonzálezGonzález則失去民意支援度更高的水體從水面到器底同一水平面上)，並自此建國。 ｜ 生態旅遊服務中心與大武壠語及馬福春早在1745年由於",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  },
+  {
+   "model": "bigram",
+   "seed": "1990年",
+   "mode": "greedy",
+   "rng_seed": null,
+   "text": "，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是",
+   "cycle_start": 5,
+   "cycle_length": 4,
+   "n_sentences": 0
+  },
+  {
+   "model": "bigram",
+   "seed": "1990年",
+   "mode": "sample",
+   "rng_seed": 0,
+   "text": "美國在此天體存在相對論預測通常可以早中新世的旱林亞熱帶溼潤，困難。 ｜ 1947年，該書涵蓋政治學專業拆機報告還尚未抵達義大利足球的積分配置站下車時退回申請香港特區行政長官施政報告中的有機合成中： ｜ 佳",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  },
+  {
+   "model": "bigram",
+   "seed": "1990年",
+   "mode": "sample",
+   "rng_seed": 1,
+   "text": "的伸展臺上跳樓事件後墜毀。 ｜ 在說明為何這麼相似，馬修，被破壞神經系統疾病或ltaasvxtxaasvxtxgt有時難以持久的美國十歲那年，如同袁世凱進行甚至是本。 ｜ 中間綁有自己就任為止。 ｜ 人口埃爾利",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 3
+  },
+  {
+   "model": "bigram",
+   "seed": "1990年",
+   "mode": "sample",
+   "rng_seed": 2,
+   "text": "3月的第23。 ｜ 《天堂共和國總理，形成一對老夫妻住老婆未確認，不做祖母正是當年仇思達2002年，包括陰毛亦共同建造。 ｜ 改編前後》第三十五條：申昇瓚，慕容農南路的郵政編碼為",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  },
+  {
+   "model": "trigram",
+   "seed": "1990年",
+   "mode": "greedy",
+   "rng_seed": null,
+   "text": "，他在《》，是下轄的一個市鎮，屬於安第斯山脈的一部分，海拔高度約5000人。 ｜ 在《》，是下轄的一個市鎮，屬於安第斯山脈的一部分，海拔高度約5000人。 ｜ 在《》，是下轄",
+   "cycle_start": 25,
+   "cycle_length": 21,
+   "n_sentences": 2
+  },
+  {
+   "model": "trigram",
+   "seed": "1990年",
+   "mode": "sample",
+   "rng_seed": 0,
+   "text": "成立的。 ｜ 迨事平，論罪是陪審團最後決定撤軍。 ｜ 2019年5月8日，環保署後來於1993年重奪冠名贊助500至600米處設有JR貨物路線路軌，改為4頻道的影集包在推出後不僅",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  },
+  {
+   "model": "bigram",
+   "seed": "<s>",
+   "mode": "greedy",
+   "rng_seed": null,
+   "text": "在《》，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個市鎮，是一個",
+   "cycle_start": 8,
+   "cycle_length": 4,
+   "n_sentences": 0
+  },
+  {
+   "model": "bigram",
+   "seed": "<s>",
+   "mode": "sample",
+   "rng_seed": 0,
+   "text": "舉例，在中國事務部會員數量沒有對外防止風力時速大於1)。 ｜ 1905年6月，該書涵蓋政治學專業拆機報告還尚未抵達義大利足球的積分配置站下車時退回申請香港特區行政長官施政報告中的有機合成中： ｜ 佳",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  },
+  {
+   "model": "bigram",
+   "seed": "<s>",
+   "mode": "sample",
+   "rng_seed": 1,
+   "text": "歐洲郵務工會下屬的由來習性不明。 ｜ 常規步兵科只有18世紀的劇本。 ｜ 每屆任期四年國泰虐民甚於2003年，名庚，為百姓安之出繼華頂山南側是由里斯本部分發生了1807年的破產，寓居",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  },
+  {
+   "model": "bigram",
+   "seed": "<s>",
+   "mode": "sample",
+   "rng_seed": 2,
+   "text": "後，羅蘭·阿爾梅羅伯·菲爾茨納赫特韋爾多布蘭福德校區平井便加入中國共產黨，2006年生於天津作食物熱量，他在290是穆拉迪耶。 ｜ 改編前後》第三十五條：申昇瓚，慕容農南路的郵政編碼為",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 1
+  },
+  {
+   "model": "trigram",
+   "seed": "<s>",
+   "mode": "greedy",
+   "rng_seed": null,
+   "text": "在《》，是下轄的一個市鎮，屬於安第斯山脈的一部分，海拔高度約5000人。 ｜ 在《》，是下轄的一個市鎮，屬於安第斯山脈的一部分，海拔高度約5000人。 ｜ 在《》，是下轄的一個",
+   "cycle_start": 21,
+   "cycle_length": 21,
+   "n_sentences": 2
+  },
+  {
+   "model": "trigram",
+   "seed": "<s>",
+   "mode": "sample",
+   "rng_seed": 0,
+   "text": "舉例而言，在度假時節則可增至38隊增加至506年4月被隔離。 ｜ 在2017年11月6日羅志祥在臉書上提出一系列問題和35。 ｜ 生態旅遊服務中心與大武壠語及馬福春早在1745年由於",
+   "cycle_start": null,
+   "cycle_length": null,
+   "n_sentences": 2
+  }
+ ]
+}

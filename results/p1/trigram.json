@@ -1,0 +1,13 @@
+{
+ "n_bigrams": 4265006,
+ "n_trigrams": 8381788,
+ "time_count_bigram_s": 0.43,
+ "time_count_trigram_s": 9.634,
+ "bigram_table_bytes": 68240096,
+ "trigram_table_bytes": 134108608,
+ "n_own_sentences": 8,
+ "n_neg_inf_sentences": {
+  "bigram": 6,
+  "trigram": 8
+ }
+}
