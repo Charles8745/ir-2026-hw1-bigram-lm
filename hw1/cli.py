@@ -66,7 +66,8 @@ def cmd_prob(a: argparse.Namespace) -> None:
     r = m.prob(a.sentence)
     print("tokens:", " ".join(" ".join(s) for s in r.sentences))
     for s in r.steps:
-        print(f"  P({s.w2} | {s.w1}) = {s.count}/{s.context_count} = {s.prob:.6g}")
+        cond = f"{s.w0} {s.w1}" if s.w0 is not None else s.w1
+        print(f"  P({s.w2} | {cond}) = {s.count}/{s.context_count} = {s.prob:.6g}")
     print(f"log2 P = {r.logprob:.4f}")
     if r.first_unseen:
         print(f"first unseen pair: {r.first_unseen}")

@@ -108,3 +108,44 @@ def test_trigram_prob_uses_trigram_counts(toy_counts):
     # P(我|<s>) bigram=1 ; P(喜歡|<s>,我)=2/3 ; P(你|我,喜歡)=1/2 ; P(。|喜歡,你)=1 ; P(</s>|你,。)=1
     assert r.logprob == pytest.approx(math.log2(1 / 3))
     assert r.steps[1].context_count == 3 and r.steps[2].context_count == 2
+
+
+def test_trigram_step_carries_w0(toy_counts):
+    tm = TrigramModel.load(toy_counts)
+    r = tm.prob("我喜歡你。")
+    assert r.steps[0].w0 is None                      # 首對為 bigram
+    assert r.steps[1].w0 == BOS and r.steps[1].w2 == "喜歡"
+    assert r.steps[2].w0 == "我" and r.steps[2].w1 == "喜歡" and r.steps[2].w2 == "你"
+
+
+def test_trigram_step_oov_w2_keeps_context_count(toy_counts):
+    tm = TrigramModel.load(toy_counts)
+    r = tm.prob("我喜歡蘋果。")
+    # 蘋果 不在詞表：P(蘋果|我,喜歡)=0/2，前文 (我,喜歡) 的次數 2 仍須回報
+    assert r.steps[2].w2 == "蘋果" and r.steps[2].count == 0 and r.steps[2].context_count == 2
+
+
+def test_trigram_miss_reports_triple(toy_counts):
+    tm = TrigramModel.load(toy_counts)
+    r = tm.prob("我喜歡你。我討厭他。")
+    # 第一句全部通過；第二句 (<s>,我,討厭)=1 通過，(我,討厭,他) 未見，即第 7 步
+    assert r.logprob == -math.inf
+    assert r.first_unseen == ("我", "討厭", "他")
+    assert r.steps[7].w0 == "我" and r.steps[7].count == 0
+
+
+def test_trigram_successors_row_and_unseen(toy_counts):
+    tm = TrigramModel.load(toy_counts)
+    ids, counts = tm.trigram_successors(tm.vocab.id("我"), tm.vocab.id("喜歡"))
+    assert [tm.vocab.word(i) for i in ids] == ["你", "他"]
+    assert counts.tolist() == [1, 1]
+    ids, counts = tm.trigram_successors(tm.vocab.id("你"), tm.vocab.id("我"))
+    assert len(ids) == 0 and len(counts) == 0
+
+
+def test_single_word_seed_falls_back_to_bigram(toy_counts):
+    bm = BigramModel.load(toy_counts)
+    tm = TrigramModel.load(toy_counts)
+    assert tm.generate("喜歡", 1, mode="greedy").words == bm.generate("喜歡", 1).words
+    # 單詞前文不補 <s>：否則會查 trigram (<s>,w)，而不是退回 bigram
+    assert tm._context_from_seed("我") == [tm.vocab.id("我")]

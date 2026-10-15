@@ -58,3 +58,9 @@ def test_predict_prob_generate_cli(tmp_path):
             "--counts", str(counts), cwd=tmp_path)
     assert r.returncode == 0, r.stderr
     assert "你。 ｜" in r.stdout
+
+
+def test_prob_trigram_cli_labels_context(toy_counts, tmp_path):
+    r = run("prob", "我喜歡你。", "--trigram", "--counts", str(toy_counts), cwd=tmp_path)
+    assert r.returncode == 0, r.stderr
+    assert "P(你 | 我 喜歡) = 1/2 = 0.5" in r.stdout
