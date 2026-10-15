@@ -128,8 +128,9 @@ Part 1 的 t 與第四題的成長數據都從此取。
 
 ### 5.2 predict(w: str, k: int) -> list[tuple[str, float]]
 - `searchsorted` 找 key 落在 `[w_id<<32, (w_id+1)<<32)` 的連續區間。
-- 機率分母用該區間 count 總和（即 w 作為前詞的次數），不用 unigram
-  count(w)，因為句尾 `</s>` 沒有後繼詞。報告說明此選擇。
+- 機率分母用該區間 count 總和（即 w 作為前詞的次數）。因為每句都以 `</s>`
+  結尾，w ≠ `</s>` 時此總和等於 unigram count(w)；只有 `</s>` 本身沒有後繼。
+  統一用區間總和，測試會驗證兩者相等。
 - 依 count 降冪取前 k。w 不在詞表回傳空 list。
 
 ### 5.3 prob(sentence: str) -> ProbResult
