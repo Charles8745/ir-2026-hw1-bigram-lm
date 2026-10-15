@@ -1,4 +1,13 @@
-"""產生 report/showcase.ipynb。執行：uv run python report/build_notebook.py"""
+"""產生 report/showcase.ipynb。
+
+必須在專案根目錄執行（腳本用相對路徑寫出 report/showcase.ipynb）：
+
+    uv run python report/build_notebook.py
+
+產生後再執行一次 notebook，把輸出存進檔案：
+
+    uv run jupyter nbconvert --to notebook --execute --inplace report/showcase.ipynb --ExecutePreprocessor.timeout=600
+"""
 import nbformat as nbf
 
 RES = "results/full"
@@ -16,7 +25,10 @@ ROOT = pathlib.Path.cwd()
 ROOT = ROOT.parent if ROOT.name == "report" else ROOT   # nbconvert 與 VS Code 以 report/ 為 cwd
 RES = ROOT / "{RES}"; COUNTS = ROOT / "{COUNTS}"
 meta = json.loads((COUNTS / "meta.json").read_text())
-show = lambda name: display(Markdown((RES / f"{{name}}.md").read_text()))""")
+def show(name):
+    # 結果檔裡的 ![](q4_growth.png) 會以 report/ 為基準而破圖；圖片另由下一格顯示
+    lines = (RES / f"{{name}}.md").read_text().splitlines()
+    display(Markdown("\\n".join(l for l in lines if not l.startswith("![]("))))""")
 md("## Part 1 數：N、V、B、t")
 code("""display(Markdown(f'''
 | 指標 | 值 |
