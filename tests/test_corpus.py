@@ -22,6 +22,13 @@ def test_iter_articles_fills_caller_stats():
     assert stats == ReadStats(read=2, skipped_bad=0, skipped_empty=0)
 
 
+def test_iter_articles_limit_is_per_call_with_reused_stats():
+    stats = ReadStats()
+    assert list(iter_articles(FIXTURE, limit=1, stats=stats)) == ["我喜歡你。我喜歡他。"]
+    assert list(iter_articles(FIXTURE, limit=1, stats=stats)) == ["我喜歡你。我喜歡他。"]
+    assert stats.read == 2
+
+
 def test_reader_handles_bad_and_empty_lines(tmp_path):
     p = tmp_path / "c.json"
     p.write_text('[\n  "甲。",\n  not json,\n  "",\n  "   ",\n  "乙。"\n]\n', encoding="utf-8")

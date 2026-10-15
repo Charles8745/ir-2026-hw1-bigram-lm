@@ -19,9 +19,10 @@ class ReadStats:
 
 
 def _iter_with_stats(path: str | Path, limit: int | None, stats: ReadStats) -> Iterator[str]:
+    yielded = 0  # limit 只計本次呼叫產出的篇數，與 stats 累計值無關
     with open(path, encoding="utf-8") as f:
         for line in f:
-            if limit is not None and stats.read >= limit:
+            if limit is not None and yielded >= limit:
                 return
             s = line.strip()
             if s in ("[", "]", ""):
@@ -37,6 +38,7 @@ def _iter_with_stats(path: str | Path, limit: int | None, stats: ReadStats) -> I
                 stats.skipped_empty += 1
                 continue
             stats.read += 1
+            yielded += 1
             yield article
 
 
