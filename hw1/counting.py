@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Iterable
 
 import numpy as np
@@ -95,3 +96,69 @@ def count_trigrams(tokens: np.ndarray, bigram_keys: np.ndarray) -> tuple[np.ndar
     k3 = pack(idx, w3[mask])
     del idx, w3, mask
     return count_keys(k3)
+
+
+def run_count(
+    corpus: str | Path,
+    out_dir: str | Path,
+    limit: int | None = None,
+    workers: int = 10,
+    chunk_size: int = 2000,
+    trigram: bool = False,
+    timings_path: str | Path = "results/timings.json",
+) -> dict:
+    """完整流程：斷詞 → token 串流 → unigram/bigram(/trigram) → 存檔。回傳 meta。"""
+    from datetime import datetime, timezone
+
+    import jieba
+
+    from hw1.corpus import ReadStats
+    from hw1.segment import segment_corpus
+    from hw1.store import CountsBundle, save_counts
+    from hw1.timing import Stopwatch, record_timing
+
+    stats = ReadStats()
+    with Stopwatch() as total:
+        with Stopwatch() as t_seg:
+            tokens, vocab, offsets, n_sent = build_token_stream(
+                segment_corpus(corpus, limit=limit, workers=workers, chunk_size=chunk_size, stats=stats)
+            )
+        unigram = count_unigrams(tokens, len(vocab))
+        with Stopwatch() as t_bi:
+            bk, bc = count_bigrams(tokens)
+        tk = tc = None
+        t_tri_s = None
+        if trigram:
+            with Stopwatch() as t_tri:
+                tk, tc = count_trigrams(tokens, bk)
+            t_tri_s = t_tri.seconds
+    n_markers = int(unigram[BOS_ID] + unigram[EOS_ID])
+    meta = {
+        "corpus": str(corpus),
+        "limit": limit,
+        "n_articles": int(len(offsets) - 1),
+        "skipped_bad_lines": stats.skipped_bad,
+        "skipped_empty_articles": stats.skipped_empty,
+        "n_sentences": int(n_sent),
+        "n_tokens": int(tokens.size),
+        "n_tokens_no_markers": int(tokens.size - n_markers),
+        "vocab_size": len(vocab),
+        "vocab_size_no_markers": len(vocab) - 2,
+        "n_bigrams": int(len(bk)),
+        "bigram_tokens_total": int(bc.sum()),
+        "n_trigrams": int(len(tk)) if tk is not None else None,
+        "trigram_tokens_total": int(tc.sum()) if tc is not None else None,
+        "time_segment_s": round(t_seg.seconds, 3),
+        "time_count_bigram_s": round(t_bi.seconds, 3),
+        "time_count_trigram_s": round(t_tri_s, 3) if t_tri_s is not None else None,
+        "time_total_s": round(total.seconds, 3),
+        "workers": workers,
+        "chunk_size": chunk_size,
+        "jieba_version": jieba.__version__,
+        "dictionary": "dict.txt.big",
+        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
+    save_counts(out_dir, CountsBundle(tokens, vocab, offsets, unigram, bk, bc, tk, tc, meta))
+    record_timing("count", total.seconds, path=timings_path, out=str(out_dir),
+                  n_articles=meta["n_articles"], n_tokens=meta["n_tokens"], trigram=trigram)
+    return meta
