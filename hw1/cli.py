@@ -45,6 +45,41 @@ def cmd_top_bigrams(a: argparse.Namespace) -> None:
         print(f"{int(c)}\t{b.vocab.word(x)}\t{b.vocab.word(y)}")
 
 
+def _load_model(counts: str, trigram: bool = False):
+    from hw1.model import BigramModel, TrigramModel
+
+    return (TrigramModel if trigram else BigramModel).load(counts)
+
+
+def cmd_predict(a: argparse.Namespace) -> None:
+    m = _load_model(a.counts)
+    rows = m.predict(a.word, a.k)
+    if not rows:
+        print(f"'{a.word}' not in vocabulary or has no successors")
+        return
+    for w, p in rows:
+        print(f"{w}\t{p:.4f}")
+
+
+def cmd_prob(a: argparse.Namespace) -> None:
+    m = _load_model(a.counts, a.trigram)
+    r = m.prob(a.sentence)
+    print("tokens:", " ".join(" ".join(s) for s in r.sentences))
+    for s in r.steps:
+        print(f"  P({s.w2} | {s.w1}) = {s.count}/{s.context_count} = {s.prob:.6g}")
+    print(f"log2 P = {r.logprob:.4f}")
+    if r.first_unseen:
+        print(f"first unseen pair: {r.first_unseen}")
+
+
+def cmd_generate(a: argparse.Namespace) -> None:
+    m = _load_model(a.counts, a.trigram)
+    r = m.generate(a.seed, a.n, mode=a.mode, rng_seed=a.rng_seed)
+    print(r.text)
+    if r.mode == "greedy":
+        print(f"cycle_start={r.cycle_start} cycle_length={r.cycle_length} sentences={r.n_sentences}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="hw1")
     sub = p.add_subparsers(dest="command", required=True)
@@ -74,6 +109,27 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--counts", required=True)
     s.add_argument("--k", type=int, default=20)
     s.set_defaults(func=cmd_top_bigrams)
+
+    s = sub.add_parser("predict", help="top-k next words after W (bigram)")
+    s.add_argument("word")
+    s.add_argument("k", type=int)
+    s.add_argument("--counts", default="data/counts/full")
+    s.set_defaults(func=cmd_predict)
+
+    s = sub.add_parser("prob", help="log2 probability of a sentence")
+    s.add_argument("sentence")
+    s.add_argument("--counts", default="data/counts/full")
+    s.add_argument("--trigram", action="store_true")
+    s.set_defaults(func=cmd_prob)
+
+    s = sub.add_parser("generate", help="generate n words from seed")
+    s.add_argument("--seed", default="")
+    s.add_argument("--n", type=int, default=30)
+    s.add_argument("--mode", choices=["greedy", "sample"], default="greedy")
+    s.add_argument("--rng-seed", type=int, default=None)
+    s.add_argument("--counts", default="data/counts/full")
+    s.add_argument("--trigram", action="store_true")
+    s.set_defaults(func=cmd_generate)
     return p
 
 
