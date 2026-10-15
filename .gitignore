@@ -1,7 +1,7 @@
 wiki_article_list_2023_tra.json
 data/
-results/
 .venv/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+.pytest_cache/

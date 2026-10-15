@@ -1,0 +1,20 @@
+[
+ {
+  "command": "count",
+  "seconds": 33.439,
+  "timestamp": "2026-10-15T10:39:08+00:00",
+  "out": "data/counts/p1",
+  "n_articles": 13230,
+  "n_tokens": 12013994,
+  "trigram": true
+ },
+ {
+  "command": "count",
+  "seconds": 1720.955,
+  "timestamp": "2026-10-15T11:10:00+00:00",
+  "out": "data/counts/full",
+  "n_articles": 1323055,
+  "n_tokens": 352357784,
+  "trigram": true
+ }
+]
