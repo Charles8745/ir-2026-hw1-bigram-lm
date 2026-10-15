@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
 import numpy as np
 
@@ -81,6 +82,16 @@ def cmd_generate(a: argparse.Namespace) -> None:
         print(f"cycle_start={r.cycle_start} cycle_length={r.cycle_length} sentences={r.n_sentences}")
 
 
+def cmd_analyze(a: argparse.Namespace) -> None:
+    from hw1.analysis import run_all
+    from hw1.timing import Stopwatch, record_timing
+
+    with Stopwatch() as sw:
+        run_all(a.counts, a.out)
+    record_timing("analyze", sw.seconds, path=Path(a.out) / "timings.json", counts=str(a.counts))
+    print(f"analysis written to {a.out} in {sw.seconds:.1f}s")
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="hw1")
     sub = p.add_subparsers(dest="command", required=True)
@@ -131,6 +142,11 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--counts", default="data/counts/full")
     s.add_argument("--trigram", action="store_true")
     s.set_defaults(func=cmd_generate)
+
+    s = sub.add_parser("analyze", help="run Part 3 questions, Zipf plots, trigram comparison")
+    s.add_argument("--counts", default="data/counts/full")
+    s.add_argument("--out", default="results")
+    s.set_defaults(func=cmd_analyze)
     return p
 
 
