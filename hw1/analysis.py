@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import time
 from pathlib import Path
 
@@ -16,7 +17,7 @@ from matplotlib import font_manager  # noqa: E402
 from hw1 import BOS_ID, EOS_ID  # noqa: E402
 from hw1.counting import count_bigrams, count_unigrams  # noqa: E402
 from hw1.model import BigramModel, TrigramModel  # noqa: E402
-from hw1.store import load_counts  # noqa: E402
+from hw1.store import FILES  # noqa: E402
 
 SEEDS = ["台灣", "他", "的", "1990年", ""]
 OWN_SENTENCES = [
@@ -26,12 +27,26 @@ OWN_SENTENCES = [
     ("口語", "我今天早上吃了一個很好吃的蛋餅。"),
     ("口語", "你等一下要不要一起去看電影？"),
     ("亂湊", "香蕉打電話給星期三的數學。"),
+    # 語料寫「臺」，把句 1、3 改寫成臺的對照組（R16）
+    ("百科體（臺）", "臺灣是一個位於東亞的島嶼。"),
+    ("百科體（臺）", "該公司成立於2001年，總部位於臺北市。"),
 ]
 
 # 只保留 matplotlib 實際找得到的中文字型，避免每次畫圖都出現 findfont 警告。
 _CJK_FONTS = ["PingFang TC", "Heiti TC", "PingFang HK", "Arial Unicode MS", "STHeiti", "Hiragino Sans GB"]
 _available_fonts = {f.name for f in font_manager.fontManager.ttflist}
 plt.rcParams["font.family"] = [f for f in _CJK_FONTS if f in _available_fonts] + ["sans-serif"]
+
+
+def _md(tok: str, table: bool = False) -> str:
+    """把詞放進 code span，讓 <s>、</s>、*、_、| 等不被 Markdown / HTML 當成語法。"""
+    tok = tok.replace("\n", " ")
+    if table:
+        tok = tok.replace("|", "\\|")
+    longest = max((len(m) for m in re.findall(r"`+", tok)), default=0)
+    fence = "`" * (longest + 1)
+    pad = " " if longest else ""
+    return f"{fence}{pad}{tok}{pad}{fence}"
 
 
 def _write(out: Path, name: str, data: dict, md: str) -> None:
@@ -60,7 +75,7 @@ def q1_greedy_vs_sample(bm: BigramModel, tm: TrigramModel | None, out: Path, n: 
     for r in rows:
         tag = f"[{r['model']}/{r['mode']}" + (f"/seed{r['rng_seed']}" if r["rng_seed"] is not None else "") + "]"
         extra = f"（第 {r['cycle_start']} 步進入長度 {r['cycle_length']} 的循環）" if r["mode"] == "greedy" and r["cycle_start"] is not None else ""
-        md.append(f"- **`{r['seed']}`** {tag} {extra}: {r['text']}")
+        md.append(f"- **{_md(r['seed'])}** {tag} {extra}: {_md(r['text'])}")
     _write(out, "q1", data, "\n".join(md) + "\n")
     return data
 
@@ -88,13 +103,13 @@ def q2_predictability(bm: BigramModel, out: Path, words=("的", "台灣", "臺�
     md = ["# Q2 哪個詞後面比較好預測", "", "| 詞 | 出現次數 | 後繼種類 | top1 機率 | top10 機率和 | 條件熵 (bits) | 困惑度 |", "|---|---|---|---|---|---|---|"]
     for w, d in data.items():
         if d["in_vocab"]:
-            md.append(f"| {w} | {d['count']} | {d['n_successors']} | {d['top1_prob']:.4f} | {d['top10_mass']:.4f} | {d['entropy_bits']:.3f} | {d['perplexity']:.1f} |")
+            md.append(f"| {_md(w, table=True)} | {d['count']} | {d['n_successors']} | {d['top1_prob']:.4f} | {d['top10_mass']:.4f} | {d['entropy_bits']:.3f} | {d['perplexity']:.1f} |")
         else:
-            md.append(f"| {w} | 不在詞表 | | | | | |")
+            md.append(f"| {_md(w, table=True)} | 不在詞表 | | | | | |")
     md.append("")
     for w, d in data.items():
         if d["in_vocab"]:
-            md.append(f"- **{w}** 的前 10 名：" + "、".join(f"{t}({p:.3f})" for t, p in d["top10"]))
+            md.append(f"- **{_md(w)}** 的前 10 名：" + "、".join(f"{_md(t)}({p:.3f})" for t, p in d["top10"]))
     _write(out, "q2", data, "\n".join(md) + "\n")
     return data
 
@@ -109,21 +124,31 @@ def q3_seen_fraction(bm: BigramModel, out: Path) -> dict:
     return data
 
 
+def _n_articles(n_art: int, fraction: float) -> int:
+    """前綴子集的篇數：向下取整（1% = 13,230、10% = 132,305，R14），至少 1 篇。"""
+    return max(1, int(n_art * fraction))
+
+
 def q4_growth(counts_dir: Path, out: Path, fractions=(0.001, 0.01, 0.03, 0.1, 0.3, 1.0)) -> dict:
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
-    b = load_counts(counts_dir, with_tokens=True)
-    n_art = len(b.article_offsets) - 1
+    d = Path(counts_dir)
+    # 只載入 q4 需要的：token 串流（memmap，不佔記憶體）、篇章位移、詞表大小；不載入 bigram / trigram 表。
+    tokens = np.load(d / FILES["tokens"], mmap_mode="r")
+    article_offsets = np.load(d / FILES["article_offsets"])
+    vocab_size = int(json.loads((d / "meta.json").read_text(encoding="utf-8"))["vocab_size"])
+    n_art = len(article_offsets) - 1
     rows = []
     for f in fractions:
-        k = max(1, int(round(n_art * f)))
-        end = int(b.article_offsets[k])
-        toks = b.tokens[:end]
+        k = _n_articles(n_art, f)
+        end = int(article_offsets[k])
+        toks = tokens[:end]
         t0 = time.perf_counter()
         keys, counts = count_bigrams(toks)
-        uni = count_unigrams(toks, len(b.vocab))
+        uni = count_unigrams(toks, vocab_size)
         rows.append({"fraction": f, "n_articles": k, "N": int(toks.size), "V": int((uni[2:] > 0).sum()),
                      "B": int(len(keys)), "seconds": round(time.perf_counter() - t0, 2)})
+        del keys, counts, uni, toks
     xs = np.log([r["N"] for r in rows])
     ys = np.log([r["B"] for r in rows])
     slope = float(np.polyfit(xs, ys, 1)[0]) if len(rows) > 1 and len(set(xs)) > 1 else float("nan")
@@ -158,14 +183,14 @@ def q5_own_sentences(bm: BigramModel, tm: TrigramModel | None, out: Path) -> dic
     md = ["# Q5 自己寫的句子機率", "", "| 模型 | 類型 | 句子 | 詞數 | log₂P | 第一個未見詞對 |", "|---|---|---|---|---|---|"]
     for r in rows:
         lp = "−∞" if r["logprob"] is None else f"{r['logprob']:.2f}"
-        unseen = " ".join(r["first_unseen"]) if r["first_unseen"] else ""
+        unseen = _md(" ".join(r["first_unseen"]), table=True) if r["first_unseen"] else ""
         md.append(f"| {r['model']} | {r['label']} | {r['sentence']} | {r['n_tokens']} | {lp} | {unseen} |")
     md.append("")
     for r in rows:
         md.append(f"**{r['sentence']}**（{r['model']}）")
         for w0, w1, w2, c, ctx, p in r["steps"]:
-            cond = w1 if w0 is None else f"{w0} {w1}"
-            md.append(f"- P({w2} | {cond}) = {c}/{ctx} = {p:.3g}")
+            cond = _md(w1) if w0 is None else f"{_md(w0)} {_md(w1)}"
+            md.append(f"- P({_md(w2)} | {cond}) = {c}/{ctx} = {p:.3g}")
         md.append("")
     _write(out, "q5", {"rows": rows}, "\n".join(md) + "\n")
     return {"rows": rows}
@@ -202,7 +227,28 @@ def _count_neg_inf(m) -> int:
     return sum(1 for _, s in OWN_SENTENCES if math.isinf(m.prob(s).logprob))
 
 
-def trigram_cost(bm: BigramModel, tm: TrigramModel | None, out: Path) -> dict:
+def _cut(text: str, n: int = 60) -> str:
+    return text if len(text) <= n else text[:n] + "…"
+
+
+def _cycle(r: dict | None) -> str:
+    return "—" if r is None or r["cycle_start"] is None else f"{r['cycle_start']} / {r['cycle_length']}"
+
+
+def _greedy_table(q1_rows: list[dict]) -> list[str]:
+    """每個 seed 一列：bigram / trigram 的貪婪輸出（前 60 字）與循環（起點/長度）並排（R15）。"""
+    greedy = {(r["model"], r["seed"]): r for r in q1_rows if r["mode"] == "greedy"}
+    md = ["", "## 貪婪生成並排（文字取前 60 字）", "",
+          "| seed | bigram greedy | trigram greedy | bigram cycle (start/length) | trigram cycle (start/length) |",
+          "|---|---|---|---|---|"]
+    for seed in dict.fromkeys(r["seed"] for r in q1_rows):
+        b, t = greedy.get(("bigram", seed)), greedy.get(("trigram", seed))
+        md.append(f"| {_md(seed, table=True)} | {_md(_cut(b['text']), table=True) if b else '—'} | "
+                  f"{_md(_cut(t['text']), table=True) if t else '—'} | {_cycle(b)} | {_cycle(t)} |")
+    return md
+
+
+def trigram_cost(bm: BigramModel, tm: TrigramModel | None, out: Path, q1_rows: list[dict] | None = None) -> dict:
     meta = bm.meta
     data = {
         "n_bigrams": meta["n_bigrams"], "n_trigrams": meta.get("n_trigrams"),
@@ -223,8 +269,10 @@ def trigram_cost(bm: BigramModel, tm: TrigramModel | None, out: Path) -> dict:
           f"| 計數時間（秒） | {data['time_count_bigram_s']} | {fmt(data['time_count_trigram_s'], '')} |",
           f"| 表格大小（MB），作為載入記憶體的近似 | {data['bigram_table_bytes']/1e6:.1f} | "
           f"{'—' if data['trigram_table_bytes'] is None else format(data['trigram_table_bytes']/1e6, '.1f')} |",
-          f"| 自寫 {n_own} 句中機率為 −∞ 的句數 | {neg['bigram']} | {fmt(neg['trigram'])} |",
-          "", "生成品質比較見 q1.md；句子機率比較見 q5.md。"]
+          f"| 自寫 {n_own} 句中機率為 −∞ 的句數 | {neg['bigram']} | {fmt(neg['trigram'])} |"]
+    if tm is not None and q1_rows:
+        md += _greedy_table(q1_rows)
+    md += ["", "完整生成結果（含抽樣）見 q1.md；句子機率比較見 q5.md。"]
     _write(out, "trigram", data, "\n".join(md) + "\n")
     return data
 
@@ -232,7 +280,7 @@ def trigram_cost(bm: BigramModel, tm: TrigramModel | None, out: Path) -> dict:
 def run_all(counts_dir: str | Path, out_dir: str | Path) -> None:
     counts_dir, out = Path(counts_dir), Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    # q4 要載入整條 token 串流，先做完並釋放，避免與模型表格同時佔用記憶體。
+    # q4 要掃過整條 token 串流並做大型排序，先做完並釋放，避免與模型表格同時佔用記憶體。
     q4 = q4_growth(counts_dir, out)
     try:
         tm = TrigramModel.load(counts_dir)
@@ -241,14 +289,15 @@ def run_all(counts_dir: str | Path, out_dir: str | Path) -> None:
     except ValueError:
         tm = None
         bm = BigramModel.load(counts_dir)
+    q1 = q1_greedy_vs_sample(bm, tm, out)
     summary = {
-        "q1": q1_greedy_vs_sample(bm, tm, out),
+        "q1": q1,
         "q2": q2_predictability(bm, out),
         "q3": q3_seen_fraction(bm, out),
         "q4": q4,
         "q5": q5_own_sentences(bm, tm, out),
         "zipf": zipf_plots(bm, out),
-        "trigram": trigram_cost(bm, tm, out),
+        "trigram": trigram_cost(bm, tm, out, q1["rows"]),
         "meta": bm.meta,
     }
     (out / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8")
