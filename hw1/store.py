@@ -45,6 +45,10 @@ def save_counts(out_dir: str | Path, b: CountsBundle) -> None:
     if b.trigram_keys is not None:
         np.save(out / FILES["trigram_keys"], b.trigram_keys)
         np.save(out / FILES["trigram_counts"], b.trigram_counts)
+    else:
+        # 同目錄先前的 trigram 檔其 key 是舊 bigram 表的序號，不可留下
+        for name in ("trigram_keys", "trigram_counts"):
+            (out / FILES[name]).unlink(missing_ok=True)
     with open(out / "vocab.txt", "w", encoding="utf-8") as f:
         for w in b.vocab.words:
             f.write(w + "\n")

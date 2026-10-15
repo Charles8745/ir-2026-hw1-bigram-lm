@@ -65,3 +65,17 @@ def test_dump_bigrams_text(tmp_path):
     assert n == 15 and len(lines) == 15
     assert lines[0] == f"{BOS}\t我"
     assert f"{EOS}\t{BOS}" not in lines
+
+
+def test_rerun_without_trigram_clears_stale_trigram_files(tmp_path):
+    out = tmp_path / "counts"
+    run_count(FIXTURE, out, workers=1, trigram=True, timings_path=tmp_path / "t.json")
+    assert (out / "trigram_keys.npy").exists()
+    other = tmp_path / "other.json"
+    other.write_text('[\n  "我討厭你。"\n]\n', encoding="utf-8")
+    meta = run_count(other, out, workers=1, trigram=False, timings_path=tmp_path / "t.json")
+    assert meta["n_trigrams"] is None
+    b = load_counts(out)
+    assert b.trigram_keys is None and b.trigram_counts is None
+    assert not (out / "trigram_keys.npy").exists()
+    assert not (out / "trigram_counts.npy").exists()
